@@ -1,32 +1,29 @@
-import React from 'react';
-import { Formik, Form, Field, ErrorMessage } from 'formik';
-import * as Yup from 'yup';
-import { useDispatch } from "react-redux";
-import { addNote } from "../store/api/NoteSlice";
+import React from "react";
+import { Formik, Form, Field, ErrorMessage } from "formik";
+import * as Yup from "yup";
+import { useNavigate } from "react-router-dom";
+import { useAddNoteMutation } from "../store/api/NoteSlice";
 
 const AddNote = (props) => {
-
-  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const [addNote] = useAddNoteMutation();
 
   const initialValues = {
-    title: '',
-    content: '',
+    title: "",
+    content: "",
   };
 
   const validationSchema = Yup.object({
-    title: Yup.string().required('Title is required'),
-    content: Yup.string().required('Content is required'),
+    title: Yup.string().required("Title is required"),
+    content: Yup.string().required("Content is required"),
   });
 
   const handleSubmit = (values, { resetForm }) => {
-    // Send the data to the server (localhost:9000/create_note)
-    dispatch(addNote({
-      title: values.title,
-      content: values.content,
-    }));
-    
-
-    // Reset the form after submission
+    addNote(values)
+      .unwrap()
+      .then(() => {
+        navigate("/");
+      });
     resetForm();
   };
 
@@ -46,7 +43,11 @@ const AddNote = (props) => {
               placeholder="Title"
               className="border border-gray-300 shadow p-3 w-full rounded mb-"
             />
-            <ErrorMessage name="title" component="div" className="text-red-500" />
+            <ErrorMessage
+              name="title"
+              component="div"
+              className="text-red-500"
+            />
           </div>
 
           <div className="mb-5">
@@ -56,7 +57,11 @@ const AddNote = (props) => {
               placeholder="Body"
               className="border border-gray-300 shadow p-3 w-full rounded mb-"
             />
-            <ErrorMessage name="content" component="div" className="text-red-500" />
+            <ErrorMessage
+              name="content"
+              component="div"
+              className="text-red-500"
+            />
           </div>
 
           <button
